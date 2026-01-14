@@ -2,6 +2,10 @@
 
 At the time of writing nixpkgs does not provide options for running a [Hytale](https://hytale.com/) game server on NixOS. This flake's module adds these options.
 
+## Packages
+
+This flake packages the official Hytale Downdloader CLI. You can run it with `nix run github:osipog/nix-hytale-server#hytale-downloader -- -version`. It is used to download the server JAR-file and the game assets needed to run the server.
+
 ## Quickstart
 
 1. Add this flake as an input to your own flake.
@@ -50,7 +54,7 @@ Jan 14 02:37:52 floating-trees hytale-server-start[339424]: Authorization code: 
 
 Follow the first link and login to your account. After that the binaries and assets will be downloaded and the server will be started.
 
-Now the server is available at port **localhost:5502** (UDP).
+Now the server is available at **localhost:5502** (UDP).
 
 For further server configuration consult the [official guide](https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual#running-a-hytale-server) (Note that for actual online play the server has be authenticated with `/auth login device`).
 
