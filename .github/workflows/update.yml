@@ -11,8 +11,8 @@ jobs:
     - uses: cachix/install-nix-action@v25
       with:
         nix_path: nixpkgs=channel:nixos-unstable
-    - run: >
-        cd packages/hytale-downloader
+    - run: |
+        cd packages/hytale-downloader;
         bash update.sh
 
     - name: Commit and push
