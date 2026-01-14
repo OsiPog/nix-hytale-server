@@ -51,7 +51,7 @@ in {
       (pkgs.writeShellApplication {
         name = "hytale-server-cmd";
         text = ''
-          echo "$@" > /run/hytale.stdin
+          echo "$@" > /run/hytale-server.stdin
         '';
       })
     ];
