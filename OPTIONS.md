@@ -37,13 +37,23 @@ The directory where the server files will be created.
 
 ## [`services.hytale-server.port`](modules/nixos/hytale-server.nix#L30)
 
-The UDP port the server will be bound to
+The UDP port the server will be bound to.
 
 **Type:** `types.port`
 
 **Default:** `5520`
 
-## [`services.hytale-server.hytaleDownloaderPackage`](modules/nixos/hytale-server.nix#L35)
+## [`services.hytale-server.openFirewall`](modules/nixos/hytale-server.nix#L35)
+
+opening the firewall on the defined UDP port
+
+**Type:** `boolean`
+
+**Default:** `false`
+
+**Example:** `true`
+
+## [`services.hytale-server.hytaleDownloaderPackage`](modules/nixos/hytale-server.nix#L36)
 
 Package that contains the hytale-downloader binary
 
@@ -51,7 +61,7 @@ Package that contains the hytale-downloader binary
 
 **Default:** `pkgs.callPackage ../../packages/hytale-downloader/default.nix {}`
 
-## [`services.hytale-server.extraJvmOpts`](modules/nixos/hytale-server.nix#L40)
+## [`services.hytale-server.extraJvmOpts`](modules/nixos/hytale-server.nix#L41)
 
 Additional options passed to the java command that runs the server.
 
@@ -61,7 +71,7 @@ Additional options passed to the java command that runs the server.
 
 **Example:** `["-Xms6G" "-Xmx6G"]`
 
-## [`services.hytale-server.useRecommendedJvmOpts`](modules/nixos/hytale-server.nix#L46)
+## [`services.hytale-server.useRecommendedJvmOpts`](modules/nixos/hytale-server.nix#L47)
 
 using the recommended JVM options from https://github.com/RVSkeLe/Hytale-SelfHosted
 
