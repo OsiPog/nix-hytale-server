@@ -6,7 +6,7 @@
   ...
 }: let
   inherit (builtins) concatStringsSep;
-  inherit (lib) mkIf mkOption mkEnableOption types optionals;
+  inherit (lib) mkIf mkOption mkEnableOption types optionals optionalString;
 
   cfg = config.services.hytale-server;
 in {
@@ -32,9 +32,10 @@ in {
       type = types.port;
       default = 5520;
     };
-    hytaleDownloaderCredentialsFile = mkOption {
-      description = "Path to the JSON file created by the hytale-downloader program. Required to download the server files. Make sure that the configured user can see the file.";
-      type = types.pathWith {absolute = true;};
+    hytaleDownloaderPackage = mkOption {
+      description = "Package that contains the hytale-downloader binary";
+      type = types.package;
+      default = pkgs.callPackage ../../packages/hytale-downloader/default.nix {};
     };
     extraJvmOpts = mkOption {
       description = "Additional options passed to the java command that runs the server.";
@@ -75,22 +76,28 @@ in {
         path = with pkgs; [
           javaPackages.compiler.openjdk25
           unzip
+          cfg.hytaleDownloaderPackage
         ];
         script = ''
           cd ${cfg.stateDir}
-          ${lib.getExe flake.packages.${pkgs.system}.hytale-downloader} \
-            -skip-update-check \
-            -download-path download.zip \
-            -credentials-path ${cfg.hytaleDownloaderCredentialsFile}
 
-          unzip download.zip
-          rm download.zip
+          # trigger login
+          hytale-downloader -print-version
+
+          if [[ ! -d Server ]] || [[ ! -f Assets.zip ]] || [[ ! -f .server-version ]] || [[ "$(hytale-downloader -print-version)" != "$(cat .server-version)" ]]; then
+            hytale-downloader -print-version > .server-version
+            hytale-downloader \
+              -skip-update-check \
+              -download-path download.zip \
+
+            unzip -o download.zip
+            rm download.zip
+          fi
 
           java \
-            -XX:AOTCache=HytaleServer.aot \
+            -XX:AOTCache=Server/HytaleServer.aot \
             ${concatStringsSep " " (cfg.extraJvmOpts
             ++ (optionals cfg.useRecommendedJvmOpts [
-              "-XX:AOTCache=HytaleServer.aot"
               "-XX:+UseCompactObjectHeaders"
               "-Xms6G -Xmx6G"
               "-XX:+UseG1GC"
@@ -112,8 +119,8 @@ in {
               "-XX:G1MaxNewSizePercent=40"
               "-XX:G1HeapRegionSize=8M"
               "-XX:G1ReservePercent=20"
-            ]))}
-            -jar HytaleServer.jar \
+            ]))} \
+            -jar Server/HytaleServer.jar \
             --assets Assets.zip \
             --bind 0.0.0.0:${toString cfg.port} \
         '';
